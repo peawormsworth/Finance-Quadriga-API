@@ -2,22 +2,15 @@ package Finance::Quadriga::API::Request::Order;
 use base qw(Finance::Quadriga::API::Request);
 use strict;
 
-use constant URL        => 'https://quadriga.com/api2/user/order.json';
-use constant ATTRIBUTES => qw(currencypair mode amount price);
-use constant DATA_KEY   => 'order';
-
+use constant URL        => 'https://api.quadrigacx.com/v2/lookup_order';
+use constant ATTRIBUTES => qw(id);
+use constant DATA_KEY   => 'orders';
 
 sub url               { URL        }
 sub attributes        { ATTRIBUTES }
 sub data_key          { DATA_KEY   }
-sub currencypair      { my $self = shift; $self->get_set(@_) }
-sub mode              { my $self = shift; $self->get_set(@_) }
-sub amount            { my $self = shift; $self->get_set(@_) }
-sub price             { my $self = shift; $self->get_set(@_) }
-sub is_ready_to_send  {
-    my $self = shift;
-    return defined $self->currencypair and defined $self->mode and defined $self->amount and defined $self->price;
-}
+sub id                { my $self = shift; $self->get_set(@_) }
+sub is_ready_to_send  { defined shift->id }
 
 1;
 

@@ -2,7 +2,7 @@ package Finance::Quadriga::API::Request::Balance;
 use base qw(Finance::Quadriga::API::Request);
 use strict;
 
-use constant URL        => 'https://quadriga.com/api2/user/balance.json';
+use constant URL        => 'https://api.quadrigacx.com/v2/balance';
 use constant ATTRIBUTES => qw();
 use constant DATA_KEY   => 'balance';
 use constant READY      => 1;

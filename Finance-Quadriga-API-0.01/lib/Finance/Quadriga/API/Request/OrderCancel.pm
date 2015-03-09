@@ -2,9 +2,9 @@ package Finance::Quadriga::API::Request::OrderCancel;
 use base qw(Finance::Quadriga::API::Request);
 use strict;
 
-use constant URL        => 'https://quadriga.com/api2/user/order_cancel.json';
+use constant URL        => 'https://api.quadrigacx.com/v2/cancel_order';
 use constant ATTRIBUTES => qw(id);
-use constant DATA_KEY   => undef;
+use constant DATA_KEY   => 'orders';
 
 sub url               { URL        }
 sub attributes        { ATTRIBUTES }
