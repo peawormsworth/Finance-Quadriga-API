@@ -23,20 +23,20 @@ use Data::Dumper;
 use Finance::Quadriga::API::Request::OrderBook;
 use Finance::Quadriga::API::Request::TradeBook;
 use Finance::Quadriga::API::Request::Ticker;
-use Finance::Quadriga::API::Request::Balance;
-use Finance::Quadriga::API::Request::Transactions;
-use Finance::Quadriga::API::Request::TradeHistory;
-use Finance::Quadriga::API::Request::OrderHistory;
-use Finance::Quadriga::API::Request::Order;
-use Finance::Quadriga::API::Request::OrderCancel;
-use Finance::Quadriga::API::Request::Withdraw;
+#use Finance::Quadriga::API::Request::Balance;
+#use Finance::Quadriga::API::Request::Transactions;
+#use Finance::Quadriga::API::Request::TradeHistory;
+#use Finance::Quadriga::API::Request::OrderHistory;
+#use Finance::Quadriga::API::Request::Order;
+#use Finance::Quadriga::API::Request::OrderCancel;
+#use Finance::Quadriga::API::Request::Withdraw;
 
 use constant COMPANY              => 'Quadriga';
 use constant ERROR_NO_REQUEST     => 'No request object to send';
 use constant ERROR_NOT_READY      => 'Not enough information to send a %s request';
 use constant ERROR_IS_IT_READY    => "The request is%s READY to send\n";
 use constant ERROR_QUADRIGA       => COMPANY . " error: '%s'\n";
-use constant ERROR_UNKNOWN_STATUS => COMPANY . " returned an unknown status\n";
+#use constant ERROR_UNKNOWN_STATUS => COMPANY . " returned an unknown status\n";
 
 use constant ATTRIBUTES => qw(token secret);
 
@@ -44,13 +44,13 @@ use constant CLASS_ACTION_MAP => {
    orderbook     => 'Finance::Quadriga::API::Request::OrderBook',
    tradebook     => 'Finance::Quadriga::API::Request::TradeBook',
    ticker        => 'Finance::Quadriga::API::Request::Ticker',
-   balance       => 'Finance::Quadriga::API::Request::Balance',
-   transactions  => 'Finance::Quadriga::API::Request::Transactions',
-   trade_history => 'Finance::Quadriga::API::Request::TradeHistory',
-   order_history => 'Finance::Quadriga::API::Request::OrderHistory',
-   order         => 'Finance::Quadriga::API::Request::Order',
-   order_cancel  => 'Finance::Quadriga::API::Request::OrderCancel',
-   withdraw      => 'Finance::Quadriga::API::Request::Withdraw',
+   #balance       => 'Finance::Quadriga::API::Request::Balance',
+   #transactions  => 'Finance::Quadriga::API::Request::Transactions',
+   #trade_history => 'Finance::Quadriga::API::Request::TradeHistory',
+   #order_history => 'Finance::Quadriga::API::Request::OrderHistory',
+   #order         => 'Finance::Quadriga::API::Request::Order',
+   #order_cancel  => 'Finance::Quadriga::API::Request::OrderCancel',
+   #withdraw      => 'Finance::Quadriga::API::Request::Withdraw',
 };
 
 sub is_ready_to_send {
@@ -147,58 +147,60 @@ sub process_response {
     my $content;
     eval {
         warn Data::Dumper->Dump([$self->http_response],['Response']) if DEBUG;
+#error: malformed JSON string, neither array, object, number, string or atom, at character offset 0 (before "Can't connect to qua...") at lib/Finance/Quadriga/API.pm line 150.
         $content = $self->json->decode($self->http_response->content);
         1;
     } or do {
         $content = {};
         warn "error: $@\n";
     };
-    if (exists $content->{status}) {
-        if (lc $content->{status} eq 'ok') {
-            $self->apirate($content->{apirate}) if exists $content->{apirate};
-            if ($self->request->data_key) {
-                # crutch: there is a call to tradebook that returns the json data keyed on either
-                # 'orders' or 'trades'. As a result we have to allow this to be a hash or potential
-                # keys to search.
-                # once this is standardized on Quadriga, we will remove these conditions...
-                #
-                # TODO: watch for such a change and then reduce the code below and change Request/TrasdeBook.pm
-                if (ref $self->request->data_key) {
-                    foreach my $key (@{$self->request->data_key}) {
-                        if (exists $content->{$key}) {
-                            $self->response($content->{$key});
-                            last;
-                        }
-                    }
-                }
-                # end crutch, but also, remove the 'else' below...
-                else {
-                    $self->response($content->{$self->request->data_key});
-                }
-            }
-            else {
-                $self->response($content);
-            }
-        }
-        elsif ($content->{status} eq 'error') {
-            warn sprintf ERROR_QUADRIGA, Dumper $content->{message} if DEBUG;
-            $self->error($content->{message});
-        }
-        else {
-            # we got a response but the result was not 'success' and did not contain an 'error' key...
-            # note: your code should never get here, so I am forcing a warning and Dump of the content...
-            warn ERROR_UNKNOWN_STATUS;
-            warn Data::Dumper->Dump([$content],[sprintf 'Invalid %s Response Content', COMPANY]);
-            $self->error('unknown status');
-        }
-    }
-    else {
-        # we did not get valid content from their server. Assume an unknown HTTP error occurred...
-        $self->error({
-            type    => __PACKAGE__,
-            message => 'no status',
-        });
-    }
+    $self->response($content);
+    #if (exists $content->{status}) {
+        #if (lc $content->{status} eq 'ok') {
+            #$self->apirate($content->{apirate}) if exists $content->{apirate};
+            #if ($self->request->data_key) {
+                ## crutch: there is a call to tradebook that returns the json data keyed on either
+                ## 'orders' or 'trades'. As a result we have to allow this to be a hash or potential
+                ## keys to search.
+                ## once this is standardized on Quadriga, we will remove these conditions...
+                ##
+                ## TODO: watch for such a change and then reduce the code below and change Request/TrasdeBook.pm
+                #if (ref $self->request->data_key) {
+                    #foreach my $key (@{$self->request->data_key}) {
+                        #if (exists $content->{$key}) {
+                            #$self->response($content->{$key});
+                            #last;
+                        #}
+                    #}
+                #}
+                ## end crutch, but also, remove the 'else' below...
+                #else {
+                    #$self->response($content->{$self->request->data_key});
+                #}
+            #}
+            #else {
+                #$self->response($content);
+            #}
+        #}
+        #elsif ($content->{status} eq 'error') {
+            #warn sprintf ERROR_QUADRIGA, Dumper $content->{message} if DEBUG;
+            #$self->error($content->{message});
+        #}
+        #else {
+            ## we got a response but the result was not 'success' and did not contain an 'error' key...
+            ## note: your code should never get here, so I am forcing a warning and Dump of the content...
+            #warn ERROR_UNKNOWN_STATUS;
+            #warn Data::Dumper->Dump([$content],[sprintf 'Invalid %s Response Content', COMPANY]);
+            #$self->error('unknown status');
+        #}
+    #}
+    #else {
+        ## we did not get valid content from their server. Assume an unknown HTTP error occurred...
+        #$self->error({
+            #type    => __PACKAGE__,
+            #message => 'no status',
+        #});
+    #}
     return $self->is_success;
 }
 
